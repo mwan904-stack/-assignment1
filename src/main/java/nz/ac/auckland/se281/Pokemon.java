@@ -2,16 +2,20 @@ package nz.ac.auckland.se281;
 
 public class Pokemon {
 
-  private String name;
-  private String type;
-  private String rarity;
-  private String id;
+  private final String id;
+  private final String name;
+  private final String type;
+  private final String rarity;
 
   public Pokemon(String name, String type, String rarity, String id) {
+    this.id = id;
     this.name = name;
     this.type = type;
     this.rarity = rarity;
-    this.id = id;
+  }
+
+  public String getId() {
+    return id;
   }
 
   public String getName() {
@@ -26,7 +30,8 @@ public class Pokemon {
     return rarity;
   }
 
-  public String getId() {
-    return id;
+  @Override
+  public String toString() {
+    return name + " (" + rarity + ", " + type + ", " + id + ")";
   }
 }

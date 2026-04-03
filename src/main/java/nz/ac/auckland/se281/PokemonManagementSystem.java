@@ -20,16 +20,13 @@ public class PokemonManagementSystem {
       matches.addAll(pokemons);
     } else {
       for (Pokemon pokemon : pokemons) {
-        if (pokemon.getName().toLowerCase().contains(trimmedKeyword)
-            || pokemon.getType().toLowerCase().contains(trimmedKeyword)
-            || pokemon.getRarity().toLowerCase().contains(trimmedKeyword)
-            || pokemon.getId().toLowerCase().contains(trimmedKeyword)) {
+        if (matchesKeyword(pokemon, trimmedKeyword)) {
           matches.add(pokemon);
         }
       }
     }
 
-    if (matches.size() == 0) {
+    if (matches.isEmpty()) {
       MessageCli.POKEMON_FOUND.printMessage("are", "no", ".");
       return;
     }
@@ -39,11 +36,17 @@ public class PokemonManagementSystem {
     } else {
       MessageCli.POKEMON_FOUND.printMessage("are", String.valueOf(matches.size()), ":");
     }
-
     for (Pokemon pokemon : matches) {
       MessageCli.POKEMON_ENTRY.printMessage(
           pokemon.getName(), pokemon.getRarity(), pokemon.getType(), pokemon.getId());
     }
+  }
+
+  private boolean matchesKeyword(Pokemon pokemon, String keyword) {
+    return pokemon.getName().toLowerCase().contains(keyword)
+        || pokemon.getType().toLowerCase().contains(keyword)
+        || pokemon.getRarity().toLowerCase().contains(keyword)
+        || pokemon.getId().toLowerCase().contains(keyword);
   }
 
   public void createPokemon(String pokemonName, String typeName, String rarityName) {
