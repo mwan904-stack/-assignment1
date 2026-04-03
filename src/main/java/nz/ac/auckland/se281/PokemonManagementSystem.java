@@ -54,7 +54,7 @@ public class PokemonManagementSystem {
     String trimmedType = typeName.trim();
     String trimmedRarity = rarityName.trim();
 
-    if (trimmedName.length() < 3 || trimmedName.length() > 10) {
+    if (!isValidPokemonName(trimmedName)) {
       MessageCli.POKEMON_NOT_CREATED_INVALID_POKEMON_NAME.printMessage(trimmedName);
       return;
     }
@@ -73,33 +73,52 @@ public class PokemonManagementSystem {
 
     String storedRarity = trimmedRarity.toLowerCase();
 
-    for (Pokemon pokemon : pokemons) {
-      if (pokemon.getName().equalsIgnoreCase(trimmedName)
-          && pokemon.getRarity().equalsIgnoreCase(storedRarity)) {
-        MessageCli.POKEMON_NOT_CREATED_ALREADY_EXISTS.printMessage(trimmedName, storedRarity);
-        return;
-      }
+    if (PokemonAlreadyExists(trimmedName, storedRarity)) {
+      MessageCli.POKEMON_NOT_CREATED_ALREADY_EXISTS.printMessage(trimmedName, storedRarity);
+      return;
     }
 
-    String abbreviation = trimmedName.substring(0, 3).toUpperCase();
-    String rarityInitial = rarity.getName().substring(0, 1).toUpperCase();
+    String id = BuildPokemonId(trimmedName, rarity, pokemonType.getTypeName());
 
-    int count = 1;
-    for (Pokemon pokemon : pokemons) {
-      if (pokemon.getType().equalsIgnoreCase(pokemonType.getTypeName())) {
-        count++;
-      }
-    }
-
-    String number = String.format("%03d", count);
-    String pokemonId = abbreviation + "-" + rarityInitial + "-" + number;
-
-    Pokemon newPokemon =
-        new Pokemon(trimmedName, pokemonType.getTypeName(), storedRarity, pokemonId);
+    Pokemon newPokemon = new Pokemon(trimmedName, pokemonType.getTypeName(), storedRarity, id);
     pokemons.add(newPokemon);
 
     MessageCli.POKEMON_CREATED.printMessage(
-        trimmedName, storedRarity, pokemonType.getTypeName(), pokemonId);
+        trimmedName, storedRarity, pokemonType.getTypeName(), id);
+  }
+
+  private boolean isValidPokemonName(String name) {
+    return name.length() >= 3 && name.length() <= 10;
+  }
+
+  private boolean PokemonAlreadyExists(String name, String rarity) {
+    for (Pokemon pokemon : pokemons) {
+      if (pokemon.getName().equalsIgnoreCase(name)
+          && pokemon.getRarity().equalsIgnoreCase(rarity)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private int getPokemonCountByType(String pokemonTypeName) {
+    int count = 0;
+    for (Pokemon pokemon : pokemons) {
+      if (pokemon.getType().equalsIgnoreCase(pokemonTypeName)) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private String BuildPokemonId(
+      String name, Characteristics.Rarity rarity, String pokemonTypeName) {
+
+    String shortName = name.substring(0, 3).toUpperCase();
+    String rarityCode = rarity.getName().substring(0, 1).toUpperCase();
+    int nextNumber = getPokemonCountByType(pokemonTypeName) + 1;
+
+    return shortName + "-" + rarityCode + "-" + String.format("%03d", nextNumber);
   }
 
   // ── Task 2: Evolutions ──────────────────────────────────────────────
